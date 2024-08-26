@@ -2,7 +2,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 require('dotenv').config();
 
 // Create Express app
@@ -10,7 +9,15 @@ const app = express();
 
 // Middleware setup
 app.use(morgan('dev')); // Logger for HTTP requests
-app.use(bodyParser.json()); // Parse incoming JSON requests
+app.use(express.json()); // Parse incoming JSON requests
+
+// Custom logging middleware
+const loggingMiddleware = (req, res, next) => {
+  const currentDate = new Date();
+  console.log(`[${currentDate.toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+};
+app.use(loggingMiddleware);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { 
